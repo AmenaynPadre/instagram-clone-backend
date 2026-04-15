@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "tLvKJdrqLJo=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ASUS\\RiderProjects\\InstagramClone\\InstagramClone\\InstagramClone.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.2\\microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

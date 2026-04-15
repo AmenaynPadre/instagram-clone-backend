@@ -1,0 +1,6 @@
+@InstagramClone_HostAddress = http://localhost:5139
+
+GET {{InstagramClone_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
