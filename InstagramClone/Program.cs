@@ -1,3 +1,6 @@
+using InstagramClone.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +16,11 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Backend API for Instagram Clone project"
     });
 });
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
