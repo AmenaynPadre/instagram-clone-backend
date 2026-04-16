@@ -1,4 +1,7 @@
 using InstagramClone.Data;
+using InstagramClone.Interfaces;
+using InstagramClone.Repositories;
+using InstagramClone.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,9 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Backend API for Instagram Clone project"
     });
 });
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
