@@ -30,7 +30,6 @@
       <Folder Include="Middlewares\" />
       <Folder Include="Requests\" />
       <Folder Include="Responses\" />
-      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>

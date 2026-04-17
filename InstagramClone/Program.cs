@@ -1,8 +1,12 @@
+using System.Text;
 using InstagramClone.Data;
+using InstagramClone.Entities;
 using InstagramClone.Interfaces;
 using InstagramClone.Repositories;
 using InstagramClone.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +26,21 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super_secret_key_123super_secret_key_123super_secret_key_123super_secret_key_123"))
+        };
+    });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 

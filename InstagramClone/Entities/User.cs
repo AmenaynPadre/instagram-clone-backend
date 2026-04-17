@@ -19,4 +19,6 @@ public class User : BaseEntity
     public string? Bio { get; set; }
     
     public string? ProfilePictureUrl { get; set; }
+    
+    public ICollection<RefreshToken>? RefreshTokens { get; set; }
 }
