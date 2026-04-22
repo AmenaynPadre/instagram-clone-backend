@@ -20,10 +20,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var result = await _authService.RegisterAsync(request);
-
-        if (!result.Success)
-            return BadRequest(result);
-
         return Ok(result);
     }
 
@@ -36,9 +32,6 @@ public class AuthController : ControllerBase
             session.IpAddress,
             session.Device);
 
-        if (!result.Success)
-            return BadRequest(result);
-
         return Ok(result);
     }
 
@@ -47,17 +40,14 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.RefreshTokenAsync(refreshToken);
 
-        if (!result.Success)
-            return BadRequest(result);
-
         return Ok(result);
     }
-    
+
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
     {
         var result = await _authService.LogoutAsync(request.RefreshToken);
 
-        return result.Success ? Ok(result) : BadRequest(result);
+        return Ok(result);
     }
 }

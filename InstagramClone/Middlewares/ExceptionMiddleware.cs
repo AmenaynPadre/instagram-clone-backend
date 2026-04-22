@@ -31,6 +31,7 @@ public class ExceptionMiddleware
         context.Response.ContentType = "application/json";
 
         var response = new Result<string>();
+        Console.WriteLine($"Exception: {ex.GetType().Name}, Message: {ex.Message}");
 
         switch (ex)
         {

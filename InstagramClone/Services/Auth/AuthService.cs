@@ -5,6 +5,7 @@ using System.Text;
 using InstagramClone.Common;
 using InstagramClone.Data;
 using InstagramClone.Entities;
+using InstagramClone.Exceptions;
 using InstagramClone.Repositories.Interfaces;
 using InstagramClone.Requests;
 using InstagramClone.Responses;
@@ -38,13 +39,13 @@ public class AuthService : IAuthService
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            return Result<AuthResponse>.Fail("Email is already registered.");
+            throw new BadRequestException("Email is already registered.");
         }
 
         var existingUsername = await _userRepository.GetByUsernameAsync(request.Username);
         if (existingUsername != null)
         {
-            return Result<AuthResponse>.Fail("Username is already taken.");
+            throw new BadRequestException("Username is already taken.");
         }
 
         var user = new User
@@ -65,15 +66,15 @@ public class AuthService : IAuthService
 
     public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request, string ipAddress, string device)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Username);
+        var user = await _userRepository.GetByUsernameAsync(request.Username);
 
         if (user == null)
-            return Result<AuthResponse>.Fail("Invalid credentials");
+            throw new NotFoundException("User not found");
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
 
         if (result == PasswordVerificationResult.Failed)
-            return Result<AuthResponse>.Fail("Invalid credentials");
+            throw new UnauthorizedException("Invalid password");
 
         var tokens = await GenerateTokens(user, ipAddress, device);
 
@@ -88,13 +89,13 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(t => t.TokenHash == hash);
 
         if (token == null)
-            return Result<AuthResponse>.Fail("Invalid token");
+            throw new UnauthorizedException("Invalid refresh token");
 
         if (token.IsRevoked)
-            return Result<AuthResponse>.Fail("Token already used");
+            throw new UnauthorizedException("Token has been revoked");
 
         if (token.ExpiresAt < DateTime.UtcNow)
-            return Result<AuthResponse>.Fail("Token expired");
+            throw new UnauthorizedException("Token has expired");
 
         token.IsRevoked = true;
         token.RevokedAt = DateTime.UtcNow;
@@ -107,7 +108,7 @@ public class AuthService : IAuthService
 
         return Result<AuthResponse>.Ok(newTokens, "Token refreshed");
     }
-    
+
     public async Task<Result<bool>> LogoutAsync(string refreshToken)
     {
         var hash = HashToken(refreshToken);
@@ -116,7 +117,7 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(x => x.TokenHash == hash);
 
         if (token == null)
-            return Result<bool>.Fail("Token not found");
+            throw new NotFoundException("Refresh token not found");
 
         token.IsRevoked = true;
         token.RevokedAt = DateTime.UtcNow;
@@ -156,7 +157,7 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     private async Task<AuthResponse> GenerateTokens(User user, string ipAddress = null, string device = null)
     {
         var accessToken = GenerateJwtToken(user);
@@ -180,10 +181,10 @@ public class AuthService : IAuthService
         return new AuthResponse
         {
             AccessToken = accessToken,
-            RefreshToken = refreshToken 
+            RefreshToken = refreshToken
         };
     }
-    
+
     private string GenerateRefreshToken()
     {
         var randomBytes = new byte[64];
@@ -192,7 +193,7 @@ public class AuthService : IAuthService
 
         return Convert.ToBase64String(randomBytes);
     }
-    
+
     private string HashToken(string token)
     {
         using var sha256 = SHA256.Create();
