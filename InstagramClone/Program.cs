@@ -8,6 +8,7 @@ using InstagramClone.Repositories.Interfaces;
 using InstagramClone.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -56,6 +57,27 @@ builder.Services.AddAuthentication(options =>
     });
 builder.Services.AddAuthorization();
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value.Errors.Count > 0)
+            .SelectMany(x => x.Value.Errors)
+            .Select(x => x.ErrorMessage)
+            .ToList();
+
+        var response = new
+        {
+            success = false,
+            message = "Validation failed",
+            errors
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -69,6 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Instagram Clone API V1"); });
