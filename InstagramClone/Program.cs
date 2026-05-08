@@ -6,6 +6,7 @@ using InstagramClone.Middlewares;
 using InstagramClone.Repositories;
 using InstagramClone.Repositories.Interfaces;
 using InstagramClone.Services.Auth;
+using InstagramClone.Services.Media;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +27,14 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Backend API for Instagram Clone project"
     });
 });
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMediaService, LocalMediaService>();
 
 var key = builder.Configuration["Jwt:Key"];
 
@@ -99,5 +102,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();

@@ -21,4 +21,7 @@ public class User : BaseEntity
     public string? ProfilePictureUrl { get; set; }
     
     public ICollection<RefreshToken>? RefreshTokens { get; set; }
+    
+    public Guid? ProfileMediaId { get; set; }
+    public Media? ProfileMedia { get; set; }
 }

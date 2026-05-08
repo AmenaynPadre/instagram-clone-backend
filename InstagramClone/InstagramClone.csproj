@@ -27,4 +27,8 @@
       <Folder Include="DTOs\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Controllers\UserController.cs" />
+    </ItemGroup>
+
 </Project>
